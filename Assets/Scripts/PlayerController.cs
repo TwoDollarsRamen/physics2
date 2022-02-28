@@ -2,65 +2,59 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
-{
-	Rigidbody2D rb;
+[RequireComponent(typeof(Rigidbody))]
+public class PlayerController : MonoBehaviour {
+	[SerializeField] private float speed = 5.0f;
+	[SerializeField] private float jumpHeight = 2.0f;
+	[SerializeField] private float dashDistance = 5.0f;
+	[SerializeField] private LayerMask ground;
 
-	public float moveForce;
-	public float jumpForce;
-	public float maxVelocity;
+	[SerializeField] private float groundCheckRadius = 0.5f;
+	[SerializeField] private Vector3 groundCheckPosition;
 
-	public float friction;
-	public float air_resistence;
+	[SerializeField] private Transform playerCamera;
+	[SerializeField] private float lookSensitivity; 
 
-	public float groundCheckRadius;
-	public Vector2 groundCheckPosition;
+	private Rigidbody rb;
+	private Vector3 input = Vector3.zero;
+	private bool grounded = false;
+	private float camRotX = 0.0f;
+	public float lookXLimit = 80.0f;
 
-	private Vector2 input;
-	public bool grounded;
-
-	private Collider2D col;
-
-	public LayerMask groundLayer;
-
-	private void Start()
-	{
-		rb = GetComponent<Rigidbody2D>();
-		col = GetComponent<CapsuleCollider2D>();
+	void Start() {
+		rb = GetComponent<Rigidbody>();
+		Cursor.lockState = CursorLockMode.Locked;
 	}
 
-	private void Update()
-	{
-		input.x = Input.GetAxis("Horizontal");
-
-		if (Input.GetKeyDown(KeyCode.Z) && grounded)
-		{
-			rb.AddForce(new Vector2(0.0f, jumpForce), ForceMode2D.Impulse);
-		}
-	}
-
-	private void FixedUpdate()
-	{
-		if ((input.x > 0.0f && rb.velocity.x < maxVelocity) || (input.x < 0.0f && rb.velocity.x > -maxVelocity))
-		{
-			rb.AddForce(new Vector2(input.x * moveForce, 0.0f));
-		}
-
+	void Update() {
 		grounded = false;
-		if (Physics2D.OverlapCircle(new Vector2(transform.position.x + groundCheckPosition.x, transform.position.y + groundCheckPosition.y), groundCheckRadius, groundLayer))
-		{
+		if (Physics.OverlapSphere(rb.position + groundCheckPosition, groundCheckRadius, ground).Length > 0) {
 			grounded = true;
 		}
+
+		input = Vector3.zero;
+		input.x = Input.GetAxis("Horizontal");
+		input.z = Input.GetAxis("Vertical");
+
+		if (Input.GetButtonDown("Jump") && grounded) {
+			rb.AddForce(Vector3.up * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y), ForceMode.VelocityChange);
+		}
+
+		camRotX += -Input.GetAxis("Mouse Y") * lookSensitivity;
+		camRotX = Mathf.Clamp(camRotX, -lookXLimit, lookXLimit);
+		playerCamera.transform.localRotation = Quaternion.Euler(camRotX, 0, 0);
+		transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSensitivity, 0);
 	}
 
-	private void OnCollisionStay2D(Collision2D collision)
-	{
-		/* Do friction or something. */
+	void FixedUpdate() {
+		Vector3 movement = transform.forward * input.z + transform.right * input.x; 
+
+		rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
 	}
 
-	private void OnDrawGizmosSelected()
-	{
-		Gizmos.color = Color.green;
-		Gizmos.DrawWireSphere(new Vector3(transform.position.x + groundCheckPosition.x, transform.position.y + groundCheckPosition.y, transform.position.z), groundCheckRadius);
+	void OnDrawGizmosSelected() {
+		Gizmos.color = Color.red;
+
+		Gizmos.DrawWireSphere(transform.position + groundCheckPosition, groundCheckRadius);
 	}
 }
