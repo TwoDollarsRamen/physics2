@@ -6,14 +6,24 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 	[SerializeField] private float speed = 5.0f;
 	[SerializeField] private float jumpHeight = 2.0f;
-	[SerializeField] private float dashDistance = 5.0f;
 	[SerializeField] private LayerMask ground;
 
 	[SerializeField] private float groundCheckRadius = 0.5f;
 	[SerializeField] private Vector3 groundCheckPosition;
 
 	[SerializeField] private Transform playerCamera;
-	[SerializeField] private float lookSensitivity; 
+	[SerializeField] private float lookSensitivity;
+
+	[SerializeField] private float gunPower = 3000.0f;
+	[SerializeField] private LayerMask bloodSpawnLayer;
+	[SerializeField] private GameObject bloodParticles;
+
+	[SerializeField] private float crouchFactor = 0.5f;
+
+	[SerializeField] private GameObject rocket;
+	[SerializeField] private Transform rocketSpawnPoint;
+
+	private float originalScale;
 
 	private Rigidbody rb;
 	private Vector3 input = Vector3.zero;
@@ -24,6 +34,20 @@ public class PlayerController : MonoBehaviour {
 	void Start() {
 		rb = GetComponent<Rigidbody>();
 		Cursor.lockState = CursorLockMode.Locked;
+
+		originalScale = transform.localScale.y;
+	}
+
+	public static T GetComponentInRootLevelParent<T>(GameObject go) {
+		if (go.GetComponent<T>() != null) {
+			return go.GetComponent<T>();
+		}
+
+		if (go.transform.parent != null) {
+			return GetComponentInRootLevelParent<T>(go.transform.parent.gameObject);
+		}
+
+		return default(T);
 	}
 
 	void Update() {
@@ -44,6 +68,36 @@ public class PlayerController : MonoBehaviour {
 		camRotX = Mathf.Clamp(camRotX, -lookXLimit, lookXLimit);
 		playerCamera.transform.localRotation = Quaternion.Euler(camRotX, 0, 0);
 		transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSensitivity, 0);
+
+		if (Input.GetMouseButtonDown(0))
+		{
+			RaycastHit hitInfo;
+			if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hitInfo, 100.0f)) {
+				if (hitInfo.collider.GetComponent<Rigidbody>() != null) {
+					var p =	GetComponentInRootLevelParent<RagdollActivate>(hitInfo.collider.gameObject);
+					if (p != null) { p.Activate(); }
+
+					hitInfo.collider.GetComponent<Rigidbody>().AddForceAtPosition(-hitInfo.normal * gunPower, hitInfo.point);
+
+					if (hitInfo.collider.gameObject.layer == 7) {
+						var go = Instantiate(bloodParticles);
+						go.transform.position = hitInfo.point;
+					}
+				}
+			}
+		}
+
+		if (Input.GetMouseButtonDown(1)) {
+			var r = Instantiate(rocket, rocketSpawnPoint.position, rocketSpawnPoint.rotation);
+		}
+
+		if (Input.GetButtonDown("Crouch")) {
+			transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * crouchFactor, transform.localScale.z);
+		}
+
+		if (Input.GetButtonUp("Crouch")) {
+			transform.localScale = new Vector3(transform.localScale.x, originalScale, transform.localScale.z);
+		}
 	}
 
 	void FixedUpdate() {
