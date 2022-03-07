@@ -4995,6 +4995,10 @@ PrefabInstance:
       value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 2638282121044890277, guid: 920637d8ebbbbbc41a54114896f3e6f9, type: 3}
+      propertyPath: crouchFactor
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2638282121044890277, guid: 920637d8ebbbbbc41a54114896f3e6f9, type: 3}
       propertyPath: airControlForce
       value: 100
       objectReference: {fileID: 0}

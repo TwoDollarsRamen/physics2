@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		if (Input.GetButtonDown("Crouch")) {
-			transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y * crouchFactor, transform.localScale.z);
+			transform.localScale = new Vector3(transform.localScale.x, originalScale * crouchFactor, transform.localScale.z);
 		}
 
 		if (Input.GetButtonUp("Crouch")) {
