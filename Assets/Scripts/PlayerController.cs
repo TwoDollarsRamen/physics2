@@ -4,7 +4,9 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour {
-	[SerializeField] private float speed = 5.0f;
+	[SerializeField] private float moveForce = 5.0f;
+	[SerializeField] private float airControlForce = 5.0f;
+	[SerializeField] private float friction = 2.0f;
 	[SerializeField] private float jumpHeight = 2.0f;
 	[SerializeField] private LayerMask ground;
 
@@ -100,10 +102,18 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	void FixedUpdate() {
-		Vector3 movement = transform.forward * input.z + transform.right * input.x; 
+	void FixedUpdate()
+	{
+		Vector3 movement = transform.forward * input.z + transform.right * input.x;
 
-		rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
+		if (grounded) {
+			rb.AddForce(movement * Time.fixedDeltaTime * moveForce);
+			rb.AddForce(-rb.velocity * Time.fixedDeltaTime * friction);
+		} else
+		{
+
+			rb.AddForce(movement * Time.fixedDeltaTime * airControlForce);
+		}
 	}
 
 	void OnDrawGizmosSelected() {
