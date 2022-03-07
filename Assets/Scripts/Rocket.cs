@@ -8,6 +8,8 @@ public class Rocket : MonoBehaviour
 	[SerializeField] private float explosionRadius;
 	[SerializeField] private float explosionForce = 800.0f;
 
+	[SerializeField] private GameObject explosionEffect;
+
 	Rigidbody rb;
 	
 	void Start()
@@ -34,6 +36,8 @@ public class Rocket : MonoBehaviour
 				collider.attachedRigidbody.AddExplosionForce(explosionForce, transform.position, explosionRadius);
 			}
 		}
+
+		Instantiate(explosionEffect, transform.position, Quaternion.identity);
 
 		Destroy(gameObject);
 	}
