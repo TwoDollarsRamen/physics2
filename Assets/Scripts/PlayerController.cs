@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour {
 
 	[SerializeField] private Transform playerCamera;
 	[SerializeField] private float lookSensitivity;
+	[SerializeField] private float lookXLimit = 80.0f;
 
 	[SerializeField] private float gunPower = 3000.0f;
 	[SerializeField] private LayerMask bloodSpawnLayer;
@@ -25,19 +26,22 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField] private GameObject rocket;
 	[SerializeField] private Transform rocketSpawnPoint;
 
+	private Vector3 respawnPos;
+
 	private float originalScale;
 
 	private Rigidbody rb;
 	private Vector3 input = Vector3.zero;
 	private bool grounded = false;
 	private float camRotX = 0.0f;
-	public float lookXLimit = 80.0f;
 
 	void Start() {
 		rb = GetComponent<Rigidbody>();
 		Cursor.lockState = CursorLockMode.Locked;
 
 		originalScale = transform.localScale.y;
+
+		respawnPos = transform.position;
 	}
 
 	public static T GetComponentInRootLevelParent<T>(GameObject go) {
@@ -102,15 +106,13 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	void FixedUpdate()
-	{
+	void FixedUpdate() {
 		Vector3 movement = transform.forward * input.z + transform.right * input.x;
 
 		if (grounded) {
 			rb.AddForce(movement * Time.fixedDeltaTime * moveForce);
 			rb.AddForce(-rb.velocity * Time.fixedDeltaTime * friction);
-		} else
-		{
+		} else {
 
 			rb.AddForce(movement * Time.fixedDeltaTime * airControlForce);
 		}
@@ -120,5 +122,19 @@ public class PlayerController : MonoBehaviour {
 		Gizmos.color = Color.red;
 
 		Gizmos.DrawWireSphere(transform.position + groundCheckPosition, groundCheckRadius);
+	}
+
+	private void OnCollisionEnter(Collision collision) {
+		if (collision.collider.CompareTag("Kill")) {
+			transform.position = respawnPos;
+		}
+	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("Checkpoint"))
+		{
+			respawnPos = other.transform.position;
+		}
 	}
 }

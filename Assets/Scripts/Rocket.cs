@@ -10,6 +10,9 @@ public class Rocket : MonoBehaviour
 
 	[SerializeField] private GameObject explosionEffect;
 
+	[SerializeField] private ParticleSystem fire;
+	[SerializeField] private ParticleSystem smoke;
+
 	Rigidbody rb;
 	
 	void Start()
@@ -38,6 +41,17 @@ public class Rocket : MonoBehaviour
 		}
 
 		Instantiate(explosionEffect, transform.position, Quaternion.identity);
+
+		fire.Stop();
+		smoke.Stop();
+
+		fire.transform.parent = null;
+		smoke.transform.parent = null;
+
+		fire.transform.position = transform.position;
+		smoke.transform.position = transform.position;
+		fire.transform.localScale = transform.localScale * 10;
+		smoke.transform.localScale = transform.localScale * 10;
 
 		Destroy(gameObject);
 	}

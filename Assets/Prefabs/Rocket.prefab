@@ -9693,6 +9693,8 @@ MonoBehaviour:
   explosionRadius: 10
   explosionForce: 800
   explosionEffect: {fileID: 3558211832639265334, guid: 7da3d0f42195084489dc8dd9372b1a7f, type: 3}
+  fire: {fileID: 1673944808264289339}
+  smoke: {fileID: 1673944809000932522}
 --- !u!1 &5410607969260796407
 GameObject:
   m_ObjectHideFlags: 0

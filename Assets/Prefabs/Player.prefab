@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 2638282121044890273}
   m_Layer: 3
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -227,7 +227,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64d4249eb5aad94498a7b263df897f12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  moveForce: 5000
+  airControlForce: 100
+  friction: 500
   jumpHeight: 2
   ground:
     serializedVersion: 2
@@ -236,15 +238,15 @@ MonoBehaviour:
   groundCheckPosition: {x: 0, y: -0.86, z: 0}
   playerCamera: {fileID: 2638282119572373489}
   lookSensitivity: 2
+  lookXLimit: 89
   gunPower: 3000
   bloodSpawnLayer:
     serializedVersion: 2
     m_Bits: 128
   bloodParticles: {fileID: 3331945508081727642, guid: 0d4f28ea7a481d4469b87b4729c6d23c, type: 3}
-  crouchFactor: 0
+  crouchFactor: 0.5
   rocket: {fileID: 1673944809399081189, guid: 1d820a3233ad58741bd474452819413c, type: 3}
   rocketSpawnPoint: {fileID: 2638282119559329806}
-  lookXLimit: 89
 --- !u!136 &2638282121044890273
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -252,7 +254,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2638282121044890287}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: edca7759fdf1e4744af6684ae67c0c62, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
